@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2 class="auth-title">{{ welcome_message }}</h2>
+    <p class="auth-subtitle">Utilize o painel abaixo para gerenciar as finanças de sua empresa.</p>
+    
+    <div class="card-container">
+        <div class="card">
+            <h3>Valor Total em Caixa</h3>
+            <p class="valor-caixa R{{ '%.2f'|format(valor_total_em_caixa) }}">
+                R$ {{ "%.2f"|format(valor_total_em_caixa) }}
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3>Registro de Movimentações Financeiras</h3>
+    <form method="POST" action="/dashboard" class="auth-form">
+        <div class="form-group">
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" name="tipo">
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" name="descricao" required>
+        </div>
+        <div class="form-group">
+            <label for="valor">Valor:</label>
+            <input type="number" step="0.01" id="valor" name="valor" required>
+        </div>
+        <button type="submit" class="btn btn-block">Registrar Movimentação</button>
+    </form>
+    
+    <hr>
+
+    <h3>Histórico de Movimentações</h3>
+    
+    {% if movimentacoes %}
+        <form action="{{ url_for('apagar_historico') }}" method="post" onsubmit="return confirm('Tem certeza que deseja apagar todo o histórico de movimentações? Esta ação é irreversível.');">
+            <button type="submit" class="btn btn-delete btn-block" style="margin-bottom: 2rem;">Apagar Todo o Histórico</button>
+        </form>
+    {% else %}
+        <p>Não há movimentações registradas.</p>
+    {% endif %}
+
+    <ul class="employee-list">
+    {% for movimentacao in movimentacoes %}
+        <li class="employee-item">
+            <div class="employee-info">
+                <strong>Tipo:</strong> {{ movimentacao.tipo.capitalize() }}
+                <p><strong>Descrição:</strong> {{ movimentacao.descricao }}</p>
+                <p><strong>Valor:</strong> R$ {{ "%.2f"|format(movimentacao.valor) }}</p>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
